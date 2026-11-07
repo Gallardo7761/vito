@@ -13,8 +13,15 @@ name: vito
 services:
   discord:
     <<: *hardening
-    mem_limit: 256m
-    pids_limit: 128
+    mem_limit: 512m
+    pids_limit: 256
+    tmpfs:
+      # yt-dlp_linux (PyInstaller) extrae y carga sus .so desde /tmp;
+      # el tmpfs de Docker es noexec por defecto
+      - /tmp:exec
+    environment:
+      # el usuario vito no tiene home: yt-dlp y deno usan /tmp para sus cachés
+      - HOME=/tmp
     build: .
     image: vito-discord:${VITO_VERSION:-latest}
     container_name: vito-discord
